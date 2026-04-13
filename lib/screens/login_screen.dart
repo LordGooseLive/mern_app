@@ -59,23 +59,25 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final onSurface = colorScheme.onSurface;
 
     return Scaffold(
-      backgroundColor: Colors.white,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 40),
             child: Column(
               children: [
-                // Header in the "Sketchy" style
+                // Header
                 Text(
                   _isLogin ? 'WELCOME BACK' : 'CREATE PROFILE',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.w400,
                     letterSpacing: 2.5,
+                    color: onSurface,
                   ),
                 ),
                 
@@ -85,7 +87,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 Container(
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black, width: 1.5),
+                    border: Border.all(color: onSurface, width: 1.5),
+                    borderRadius: BorderRadius.circular(16),
                   ),
                   child: Column(
                     children: [
@@ -108,22 +111,27 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 const SizedBox(height: 30),
 
-                // Button inside a bordered box (matches sketch)
+                // Dynamic Styled Button
                 GestureDetector(
                   onTap: context.watch<AuthProvider>().isLoading ? null : _submit,
                   child: Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 15),
                     decoration: BoxDecoration(
-                      color: colorScheme.primary.withOpacity(0.1),
-                      border: Border.all(color: Colors.black, width: 1.5),
+                      color: colorScheme.primaryContainer,
+                      border: Border.all(color: onSurface, width: 1.5),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     alignment: Alignment.center,
                     child: context.watch<AuthProvider>().isLoading 
-                      ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                      ? SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: colorScheme.onPrimaryContainer))
                       : Text(
                           _isLogin ? 'LOG IN' : 'SIGN UP',
-                          style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.2),
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold, 
+                            letterSpacing: 1.2,
+                            color: colorScheme.onPrimaryContainer,
+                          ),
                         ),
                   ),
                 ),
@@ -134,7 +142,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   onPressed: _toggleMode,
                   child: Text(
                     _isLogin ? 'NEED AN ACCOUNT?' : 'ALREADY HAVE ONE?',
-                    style: const TextStyle(color: Colors.black54, fontSize: 12),
+                    style: TextStyle(color: onSurface.withOpacity(0.6), fontSize: 12),
                   ),
                 ),
               ],
@@ -159,18 +167,21 @@ class _SketchyField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final onSurface = Theme.of(context).colorScheme.onSurface;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey)),
+        Text(label, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: onSurface.withOpacity(0.5))),
         TextField(
           controller: controller,
           obscureText: obscure,
-          decoration: const InputDecoration(
+          style: TextStyle(color: onSurface),
+          decoration: InputDecoration(
             isDense: true,
-            contentPadding: EdgeInsets.symmetric(vertical: 8),
-            enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.black45)),
-            focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.black, width: 1.5)),
+            contentPadding: const EdgeInsets.symmetric(vertical: 8),
+            enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: onSurface.withOpacity(0.4))),
+            focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: onSurface, width: 1.5)),
           ),
         ),
       ],

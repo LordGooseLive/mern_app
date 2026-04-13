@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:dynamic_color/dynamic_color.dart';
 import 'providers/auth_provider.dart';
 import 'providers/pet_provider.dart';
 import 'screens/login_screen.dart';
@@ -13,6 +14,9 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
+  static final _defaultLightColorScheme = ColorScheme.fromSeed(seedColor: Colors.blue);
+  static final _defaultDarkColorScheme = ColorScheme.fromSeed(seedColor: Colors.blue, brightness: Brightness.dark);
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -20,18 +24,25 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => PetProvider()),
       ],
-      child: MaterialApp(
-        title: 'Pet Tracker',
-        debugShowCheckedModeBanner: false,
-        // Material 3 automatically picks up some system-like feels
-        // We'll set a base seed, but the screens will use the "sketch" look
-        theme: ThemeData(
-          useMaterial3: true,
-          colorSchemeSeed: Colors.blue, // Base color
-          brightness: Brightness.light,
-          fontFamily: 'sans-serif',
-        ),
-        home: const AppRouter(),
+      child: DynamicColorBuilder(
+        builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
+          return MaterialApp(
+            title: 'Pet Tracker',
+            debugShowCheckedModeBanner: false,
+            theme: ThemeData(
+              colorScheme: lightDynamic ?? _defaultLightColorScheme,
+              useMaterial3: true,
+              fontFamily: 'sans-serif',
+            ),
+            darkTheme: ThemeData(
+              colorScheme: darkDynamic ?? _defaultDarkColorScheme,
+              useMaterial3: true,
+              fontFamily: 'sans-serif',
+            ),
+            themeMode: ThemeMode.system,
+            home: const AppRouter(),
+          );
+        },
       ),
     );
   }

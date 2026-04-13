@@ -33,10 +33,10 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
     final petProvider = context.watch<PetProvider>();
-    final user = auth.currentUser;
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
 
     return Scaffold(
-      backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
@@ -44,12 +44,13 @@ class _HomeScreenState extends State<HomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // Header: OWNER PROFILE
-              const Text(
+              Text(
                 'OWNER PROFILE',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w400,
                   letterSpacing: 2.0,
+                  color: onSurface,
                 ),
               ),
               const SizedBox(height: 30),
@@ -58,23 +59,24 @@ class _HomeScreenState extends State<HomeScreen> {
               Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black, width: 1.5),
+                  border: Border.all(color: onSurface, width: 1.5),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   children: [
-                    const Text(
+                    Text(
                       'HOUSEHOLD',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w400,
                         letterSpacing: 1.5,
+                        color: onSurface,
                       ),
                     ),
                     const SizedBox(height: 20),
                     
-                    // Pet Grid (Inner Box removed, keeping layout)
+                    // Pet Grid
                     SizedBox(
                       height: 140,
                       child: petProvider.isLoading 
@@ -103,13 +105,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 width: 250,
                 height: 100,
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black, width: 1.5),
+                  border: Border.all(color: onSurface, width: 1.5),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 alignment: Alignment.center,
-                child: const Text(
+                child: Text(
                   'DAILY LOG / HEALTH',
-                  style: TextStyle(color: Colors.grey),
+                  style: TextStyle(color: onSurface.withOpacity(0.5)),
                 ),
               ),
               
@@ -141,6 +143,8 @@ class _PetAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final onSurface = Theme.of(context).colorScheme.onSurface;
+
     return GestureDetector(
       onTap: () => Navigator.push(
         context,
@@ -156,7 +160,7 @@ class _PetAvatar extends StatelessWidget {
               height: 60,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.black, width: 1.0),
+                border: Border.all(color: onSurface, width: 1.0),
               ),
               alignment: Alignment.center,
               child: Text(
@@ -167,7 +171,7 @@ class _PetAvatar extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               pet.name.toUpperCase(),
-              style: const TextStyle(fontSize: 12),
+              style: TextStyle(fontSize: 12, color: onSurface),
               textAlign: TextAlign.center,
               overflow: TextOverflow.ellipsis,
             ),
@@ -184,6 +188,8 @@ class _AddPetButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final onSurface = Theme.of(context).colorScheme.onSurface;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -195,14 +201,14 @@ class _AddPetButton extends StatelessWidget {
               height: 60,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.black, width: 1.0, style: BorderStyle.solid),
+                border: Border.all(color: onSurface, width: 1.0, style: BorderStyle.solid),
               ),
-              child: const Icon(Icons.add, size: 30),
+              child: Icon(Icons.add, size: 30, color: onSurface),
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'ADD PET',
-              style: TextStyle(fontSize: 10),
+              style: TextStyle(fontSize: 10, color: onSurface),
               textAlign: TextAlign.center,
             ),
           ],

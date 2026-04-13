@@ -30,13 +30,13 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
   Widget build(BuildContext context) {
     final auth = context.read<AuthProvider>();
     final petProvider = context.read<PetProvider>();
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
+        iconTheme: IconThemeData(color: onSurface),
         actions: [
           IconButton(
             icon: const Icon(Icons.save_outlined),
@@ -70,10 +70,11 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
             TextField(
               controller: _nameController,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 2.0,
+                color: onSurface,
               ),
               decoration: const InputDecoration(
                 border: InputBorder.none,
@@ -89,10 +90,10 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
               height: 120,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.black, width: 1.5),
+                border: Border.all(color: onSurface, width: 1.5),
               ),
-              child: const Center(
-                child: Text('PHOTO', style: TextStyle(color: Colors.grey, fontSize: 12)),
+              child: Center(
+                child: Text('PHOTO', style: TextStyle(color: onSurface.withOpacity(0.5), fontSize: 12)),
               ),
             ),
             
@@ -106,6 +107,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                     label: 'Species',
                     child: TextField(
                       controller: _speciesController,
+                      style: TextStyle(color: onSurface),
                       decoration: const InputDecoration(border: InputBorder.none, isDense: true),
                       textAlign: TextAlign.center,
                     ),
@@ -117,6 +119,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                     label: 'Age',
                     child: TextField(
                       controller: _ageController,
+                      style: TextStyle(color: onSurface),
                       keyboardType: TextInputType.number,
                       decoration: const InputDecoration(border: InputBorder.none, isDense: true),
                       textAlign: TextAlign.center,
@@ -176,16 +179,18 @@ class _InfoBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final onSurface = Theme.of(context).colorScheme.onSurface;
+
     return Column(
       children: [
-        Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400)),
+        Text(label, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: onSurface)),
         const SizedBox(height: 5),
         Container(
           width: double.infinity,
           height: height,
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.black, width: 1.0),
+            border: Border.all(color: onSurface, width: 1.0),
             borderRadius: BorderRadius.circular(12),
           ),
           child: child,
