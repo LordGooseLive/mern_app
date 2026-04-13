@@ -9,6 +9,7 @@ class ApiService {
   
   static const String loginEndpoint = '/login';
   static const String registerEndpoint = '/register';
+  static const String resetPasswordEndpoint = '/resetpassword';
 
   static Map<String, String> get defaultHeaders {
     return {
@@ -85,6 +86,23 @@ class ApiService {
         return {'success': true, 'message': 'User registered successfully'};
       }
       return {'success': false, 'message': data['error'] ?? 'Registration failed'};
+    } catch (e) {
+      return {'success': false, 'message': 'Connection error: ${e.toString()}'};
+    }
+  }
+
+  static Future<Map<String, dynamic>> requestPasswordReset({required String email}) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl$resetPasswordEndpoint'),
+        headers: defaultHeaders,
+        body: jsonEncode({'Email': email}),
+      ).timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': 'Reset email sent!'};
+      }
+      return {'success': false, 'message': 'Failed to send reset email'};
     } catch (e) {
       return {'success': false, 'message': 'Connection error: ${e.toString()}'};
     }

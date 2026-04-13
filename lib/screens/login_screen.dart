@@ -145,6 +145,34 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: TextStyle(color: onSurface.withOpacity(0.6), fontSize: 12),
                   ),
                 ),
+
+                if (_isLogin)
+                  TextButton(
+                    onPressed: () {
+                      final email = _emailController.text.trim();
+                      if (email.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Enter your email first')),
+                        );
+                        return;
+                      }
+                      context.read<AuthProvider>().requestPasswordReset(email).then((success) {
+                        if (success) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Password reset email sent!')),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(context.read<AuthProvider>().errorMessage ?? 'Error')),
+                          );
+                        }
+                      });
+                    },
+                    child: Text(
+                      'FORGOT PASSWORD?',
+                      style: TextStyle(color: onSurface.withOpacity(0.6), fontSize: 10),
+                    ),
+                  ),
               ],
             ),
           ),

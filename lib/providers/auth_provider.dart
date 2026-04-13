@@ -131,6 +131,33 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  // Request password reset
+  Future<bool> requestPasswordReset(String email) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final result = await ApiService.requestPasswordReset(email: email);
+      if (result['success']) {
+        _errorMessage = null;
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      } else {
+        _errorMessage = result['message'] ?? 'Reset failed';
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      _errorMessage = 'Error: ${e.toString()}';
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
   // Logout user
   Future<void> logout() async {
     _isLoading = true;

@@ -192,7 +192,7 @@ class _AddPetButton extends StatelessWidget {
 
     return GestureDetector(
       onTap: onTap,
-      child: Container(
+      child: SizedBox(
         width: 80,
         child: Column(
           children: [
