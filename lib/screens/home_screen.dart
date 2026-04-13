@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
 import '../providers/auth_provider.dart';
 import '../providers/pet_provider.dart';
 import '../models/pet.dart';
@@ -22,167 +21,105 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _refreshData() async {
     final auth = context.read<AuthProvider>();
-    if (auth.currentUser != null && auth.authToken != null) {
+    if (auth.currentUser != null) {
       await context.read<PetProvider>().fetchPets(
             userId: auth.currentUser!.id,
-            token: auth.authToken!,
+            token: auth.authToken ?? '',
           );
     }
   }
 
-  void _logout() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Logout'),
-        content: const Text('Are you sure you want to sign out?'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              context.read<AuthProvider>().logout();
-            },
-            child: const Text('Logout', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
+    final auth = context.watch<AuthProvider>();
+    final petProvider = context.watch<PetProvider>();
+    final user = auth.currentUser;
+
     return Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: const Text('My Pets', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.white,
-        actions: [
-          IconButton(onPressed: _logout, icon: const Icon(Icons.logout_rounded)),
-        ],
-      ),
-      body: Consumer<PetProvider>(
-        builder: (context, provider, _) {
-          if (provider.isLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (provider.pets.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.pets, size: 100, color: Colors.grey[300]),
-                  const SizedBox(height: 16),
-                  Text('No pets found', style: TextStyle(fontSize: 18, color: Colors.grey[600])),
-                  const SizedBox(height: 8),
-                  ElevatedButton(
-                    onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const PetDetailScreen()),
-                    ),
-                    child: const Text('Add Your First Pet'),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          return RefreshIndicator(
-            onRefresh: _refreshData,
-            child: ListView.builder(
-              padding: const EdgeInsets.only(top: 8, bottom: 80),
-              itemCount: provider.pets.length,
-              itemBuilder: (context, index) {
-                return PetListItem(pet: provider.pets[index]);
-              },
-            ),
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const PetDetailScreen()),
-        ),
-        label: const Text('Add Pet'),
-        icon: const Icon(Icons.add),
-      ),
-    );
-  }
-}
-
-class PetListItem extends StatelessWidget {
-  final Pet pet;
-  const PetListItem({required this.pet, super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final dateFormat = DateFormat('MMM d, h:mm a');
-
-    return Card(
-      child: InkWell(
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => PetDetailScreen(pet: pet)),
-        ),
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Row(
-                children: [
-                  CircleAvatar(
-                    radius: 24,
-                    backgroundColor: theme.colorScheme.primaryContainer,
-                    child: Text(
-                      pet.name.isNotEmpty ? pet.name[0].toUpperCase() : '?',
-                      style: TextStyle(color: theme.colorScheme.onPrimaryContainer, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(pet.name, style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
-                        Text('${pet.species}${pet.breed != null ? ' • ${pet.breed}' : ''}', 
-                          style: theme.textTheme.bodyMedium?.copyWith(color: Colors.grey[600])),
-                      ],
-                    ),
-                  ),
-                  const Icon(Icons.chevron_right_rounded),
-                ],
+              // Header: OWNER PROFILE
+              const Text(
+                'OWNER PROFILE',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w400,
+                  letterSpacing: 2.0,
+                ),
               ),
-              if (pet.nextFeeding != null || pet.nextWalk != null) ...[
-                const Divider(height: 24),
-                Row(
+              const SizedBox(height: 30),
+
+              // HOUSEHOLD Section
+              Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.black, width: 1.5),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
                   children: [
-                    if (pet.nextFeeding != null)
-                      Expanded(
-                        child: _ScheduleInfo(
-                          icon: Icons.restaurant_rounded,
-                          label: 'Feeding',
-                          time: dateFormat.format(pet.nextFeeding!),
-                          color: Colors.orange,
-                        ),
+                    const Text(
+                      'HOUSEHOLD',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w400,
+                        letterSpacing: 1.5,
                       ),
-                    if (pet.nextWalk != null)
-                      Expanded(
-                        child: _ScheduleInfo(
-                          icon: Icons.directions_walk_rounded,
-                          label: 'Walk',
-                          time: dateFormat.format(pet.nextWalk!),
-                          color: Colors.blue,
-                        ),
-                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    
+                    // Pet Grid (Inner Box removed, keeping layout)
+                    SizedBox(
+                      height: 140,
+                      child: petProvider.isLoading 
+                        ? const Center(child: CircularProgressIndicator())
+                        : ListView(
+                            scrollDirection: Axis.horizontal,
+                            padding: const EdgeInsets.symmetric(vertical: 20),
+                            children: [
+                              ...petProvider.pets.map((pet) => _PetAvatar(pet: pet)),
+                              if (petProvider.pets.length < 3)
+                                _AddPetButton(onTap: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (_) => const PetDetailScreen()),
+                                )),
+                            ],
+                          ),
+                    ),
                   ],
                 ),
-              ],
+              ),
+
+              const SizedBox(height: 40),
+
+              // Bottom Section: Something else idk
+              Container(
+                width: 250,
+                height: 100,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.black, width: 1.5),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                alignment: Alignment.center,
+                child: const Text(
+                  'DAILY LOG / HEALTH',
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ),
+              
+              const SizedBox(height: 40),
+              
+              // Logout Button
+              TextButton(
+                onPressed: () => auth.logout(),
+                child: const Text('LOGOUT', style: TextStyle(color: Colors.red, letterSpacing: 1.2)),
+              ),
             ],
           ),
         ),
@@ -191,30 +128,86 @@ class PetListItem extends StatelessWidget {
   }
 }
 
-class _ScheduleInfo extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String time;
-  final Color color;
+class _PetAvatar extends StatelessWidget {
+  final Pet pet;
+  const _PetAvatar({required this.pet});
 
-  const _ScheduleInfo({required this.icon, required this.label, required this.time, required this.color});
+  String _getPetEmoji(String species) {
+    final s = species.toLowerCase().trim();
+    if (s.contains('dog')) return '🐶';
+    if (s.contains('cat')) return '🐱';
+    return '🐾';
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Icon(icon, size: 16, color: color),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(label, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey)),
-              Text(time, style: const TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis),
-            ],
-          ),
+    return GestureDetector(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => PetDetailScreen(pet: pet)),
+      ),
+      child: Container(
+        width: 80,
+        margin: const EdgeInsets.only(right: 15),
+        child: Column(
+          children: [
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.black, width: 1.0),
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                _getPetEmoji(pet.species),
+                style: const TextStyle(fontSize: 30),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              pet.name.toUpperCase(),
+              style: const TextStyle(fontSize: 12),
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
         ),
-      ],
+      ),
+    );
+  }
+}
+
+class _AddPetButton extends StatelessWidget {
+  final VoidCallback onTap;
+  const _AddPetButton({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 80,
+        child: Column(
+          children: [
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.black, width: 1.0, style: BorderStyle.solid),
+              ),
+              child: const Icon(Icons.add, size: 30),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'ADD PET',
+              style: TextStyle(fontSize: 10),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

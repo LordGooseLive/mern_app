@@ -21,18 +21,15 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => PetProvider()),
       ],
       child: MaterialApp(
-        title: 'Pet Tracker 22',
+        title: 'Pet Tracker',
         debugShowCheckedModeBanner: false,
+        // Material 3 automatically picks up some system-like feels
+        // We'll set a base seed, but the screens will use the "sketch" look
         theme: ThemeData(
           useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color(0xFF6750A4),
-            brightness: Brightness.light,
-          ),
-          cardTheme: const CardThemeData(
-            elevation: 2,
-            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          ),
+          colorSchemeSeed: Colors.blue, // Base color
+          brightness: Brightness.light,
+          fontFamily: 'sans-serif',
         ),
         home: const AppRouter(),
       ),
@@ -51,20 +48,14 @@ class _AppRouterState extends State<AppRouter> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() {
-      if (mounted) {
-        context.read<AuthProvider>().initializeAuth();
-      }
-    });
+    Future.microtask(() => context.read<AuthProvider>().initializeAuth());
   }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<AuthProvider>(
       builder: (context, auth, _) {
-        if (auth.isInitializing) {
-          return const SplashScreen();
-        }
+        if (auth.isInitializing) return const SplashScreen();
         return auth.isLoggedIn ? const HomeScreen() : const LoginScreen();
       },
     );
@@ -73,20 +64,8 @@ class _AppRouterState extends State<AppRouter> {
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
-
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.pets, size: 80, color: Colors.deepPurple),
-            SizedBox(height: 24),
-            CircularProgressIndicator(),
-          ],
-        ),
-      ),
-    );
+    return const Scaffold(body: Center(child: CircularProgressIndicator()));
   }
 }
