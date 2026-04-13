@@ -66,7 +66,6 @@ class ApiService {
     }
   }
 
-  //Register new user
   static Future<Map<String, dynamic>> register({
     required String fName,
     required String lName,
@@ -87,9 +86,34 @@ class ApiService {
 
       final data = jsonDecode(response.body);
       if (response.statusCode == 200 && data['id'] != -1) {
-        return {'success': true, 'message': 'User registered successfully'};
+        // Return a dummy user/token so AuthProvider can log them in automatically
+        final user = User(
+          id: data['id'].toString(),
+          fName: fName,
+          lName: lName,
+          email: email,
+          isVerified: false,
+        );
+        return {'success': true, 'user': user, 'token': 'session-token'};
       }
       return {'success': false, 'message': data['error'] ?? 'Registration failed'};
+    } catch (e) {
+      return {'success': false, 'message': 'Connection error: ${e.toString()}'};
+    }
+  }
+
+  static Future<Map<String, dynamic>> requestPasswordReset({required String email}) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl$resetPasswordEndpoint'),
+        headers: defaultHeaders,
+        body: jsonEncode({'Email': email}),
+      ).timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': 'Reset email sent!'};
+      }
+      return {'success': false, 'message': 'Failed to send reset email'};
     } catch (e) {
       return {'success': false, 'message': 'Connection error: ${e.toString()}'};
     }
@@ -150,7 +174,6 @@ class ApiService {
     required String token,
   }) async {
     try {
-      // Server expects: { userId, name, species, age, lastFeeding, lastWalk }
       final response = await http.post(
         Uri.parse('$baseUrl/addpet'),
         headers: defaultHeaders,
@@ -186,7 +209,6 @@ class ApiService {
     required String token
   }) async {
     try {
-      // Server expects: { petId, name, species, age, notes }
       final response = await http.post(
         Uri.parse('$baseUrl/updatepet'),
         headers: defaultHeaders,
