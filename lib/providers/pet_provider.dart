@@ -41,6 +41,37 @@ class PetProvider extends ChangeNotifier {
     }
   }
 
+  // Search pets
+  Future<void> searchPets({
+    required String userId,
+    required String query,
+    required String token,
+  }) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final result = await ApiService.searchPets(
+        userId: userId,
+        search: query,
+        token: token,
+      );
+
+      if (result['success']) {
+        _pets = result['pets'] ?? [];
+        _errorMessage = null;
+      } else {
+        _errorMessage = result['message'] ?? 'Search failed';
+      }
+    } catch (e) {
+      _errorMessage = 'Error searching pets: ${e.toString()}';
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   // Add a new pet
   Future<bool> addPet({
     required Pet pet,
@@ -57,10 +88,8 @@ class PetProvider extends ChangeNotifier {
       );
 
       if (result['success']) {
-        _pets.add(result['pet']);
-        _errorMessage = null;
-        _isLoading = false;
-        notifyListeners();
+        // We re-fetch to get the server-calculated nextWalk/nextFeeding and new ID
+        await fetchPets(userId: pet.ownerId, token: token);
         return true;
       } else {
         _errorMessage = result['message'] ?? 'Failed to add pet';
@@ -96,7 +125,7 @@ class PetProvider extends ChangeNotifier {
       if (result['success']) {
         final index = _pets.indexWhere((p) => p.id == petId);
         if (index != -1) {
-          _pets[index] = result['pet'];
+          _pets[index] = pet;
         }
         _errorMessage = null;
         _isLoading = false;
