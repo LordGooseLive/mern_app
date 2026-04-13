@@ -5,7 +5,7 @@ import '../models/pet.dart';
 
 class ApiService {
   // Use your computer's actual IPv4 address
-  static const String baseUrl = 'http://192.168.0.48:5000/api';
+  static const String baseUrl = 'http://198.199.79.159/api';
   
   static const String loginEndpoint = '/login';
   static const String registerEndpoint = '/register';
